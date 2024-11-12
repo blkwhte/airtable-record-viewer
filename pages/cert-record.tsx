@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation'; 
 import { fetchCertRecord, Record } from '@/app/lib/airtable';
 
 const sharedFields = [
@@ -50,9 +49,16 @@ const libraryOnlyFields = [
 ];
 
 export default function CertRecord() {
-  const searchParams = useSearchParams();
-  const clientId = searchParams.get('clientId');
+  const [clientId, setClientId] = useState<string | null>(null);
   const [recordData, setRecordData] = useState<Record['fields'] | null>(null);
+
+  useEffect(() => {
+    // Ensure the code only runs on the client side
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      setClientId(searchParams.get('clientId'));
+    }
+  }, []);
 
   useEffect(() => {
     if (clientId) {
