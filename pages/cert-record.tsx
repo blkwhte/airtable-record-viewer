@@ -48,18 +48,13 @@ const libraryOnlyFields = [
   'Sync button',
 ];
 
-// Define a type for the fields
-interface FieldValue {
-  url?: string;
-  [key: string]: any;  // Allow other fields to be added dynamically
-}
+type FieldValue = string | number | boolean | { url?: string; [key: string]: any };
 
 export default function CertRecord() {
   const [clientId, setClientId] = useState<string | null>(null);
   const [recordData, setRecordData] = useState<Record['fields'] | null>(null);
 
   useEffect(() => {
-    // Ensure the code only runs on the client side
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
       setClientId(searchParams.get('clientId'));
@@ -91,10 +86,12 @@ export default function CertRecord() {
   const renderFieldValue = (field: string) => {
     const value = recordData?.[field];
 
-    // Check if value is an object (FieldValue) and has a url property
+    // If value is an object, check for the `url` property
     if (value && typeof value === 'object' && !Array.isArray(value)) {
-      if ((value as FieldValue).url) {
-        return <img src={(value as FieldValue).url} alt={field} className="w-24 h-24 object-cover" />;
+      const fieldValue = value as { url?: string };
+
+      if (fieldValue.url) {
+        return <img src={fieldValue.url} alt={field} className="w-24 h-24 object-cover" />;
       }
       // Handle any other objects as needed
       return <pre>{JSON.stringify(value, null, 2)}</pre>;
