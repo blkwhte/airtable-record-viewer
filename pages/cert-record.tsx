@@ -48,6 +48,12 @@ const libraryOnlyFields = [
   'Sync button',
 ];
 
+// Define a type for the fields
+interface FieldValue {
+  url?: string;
+  [key: string]: any;  // Allow other fields to be added dynamically
+}
+
 export default function CertRecord() {
   const [clientId, setClientId] = useState<string | null>(null);
   const [recordData, setRecordData] = useState<Record['fields'] | null>(null);
@@ -85,15 +91,16 @@ export default function CertRecord() {
   const renderFieldValue = (field: string) => {
     const value = recordData?.[field];
 
-    if (value && typeof value === 'object') {
-      // If the field is an object (like an image), check for specific properties
-      if (value.url) {
-        return <img src={value.url} alt={field} className="w-24 h-24 object-cover" />;
+    // Check if value is an object (FieldValue) and has a url property
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      if ((value as FieldValue).url) {
+        return <img src={(value as FieldValue).url} alt={field} className="w-24 h-24 object-cover" />;
       }
-      // Handle any other objects as needed, or render a generic representation
+      // Handle any other objects as needed
       return <pre>{JSON.stringify(value, null, 2)}</pre>;
     }
 
+    // For non-object values, just return them as is
     return value || 'N/A';
   };
 
