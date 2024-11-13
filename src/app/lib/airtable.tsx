@@ -14,7 +14,7 @@ export interface AirtableResponse {
 // Airtable configuration
 const BASE_ID = process.env.NEXT_PUBLIC_BASE_ID || '';
 const TABLE_NAME = process.env.NEXT_PUBLIC_TABLE_NAME || '';
-const PERSONAL_ACCESS_TOKEN = process.env.NEXT_PUBLIC_PERSONAL_ACCESS_TOKEN || '';
+const PERSONAL_ACCESS_TOKEN = process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN || '';
 
 const airtableBase = new Airtable({ apiKey: PERSONAL_ACCESS_TOKEN }).base(BASE_ID);
 
