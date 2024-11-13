@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { fetchCertRecord, Record } from '@/app/lib/airtable';
+import Image from 'next/image';
 
 const sharedFields = [
   'App Name',
@@ -79,8 +80,9 @@ export default function CertRecord() {
     const value = recordData?.[field];
 
     // Check if the value is an object with a 'url' property (for images, for example)
-    if (value && typeof value === 'object' && value.hasOwnProperty('url')) {
-      return <img src={value.url} alt={field} className="w-24 h-24 object-cover" />;
+    if (value && typeof value === 'object' && 'url' in value) {
+      const imageUrl = (value as { url: string }).url; // Ensure TypeScript treats value as object with url
+      return <Image src={imageUrl} alt={field} width={96} height={96} className="object-cover" />;
     }
 
     return value || 'N/A';
