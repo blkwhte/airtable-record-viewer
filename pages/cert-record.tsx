@@ -48,18 +48,10 @@ const libraryOnlyFields = [
   'Sync button',
 ];
 
-type FieldValue = string | number | boolean | { url?: string; [key: string]: any };
-
 export default function CertRecord() {
-  const [clientId, setClientId] = useState<string | null>(null);
+  const searchParams = new URLSearchParams(window.location.search);
+  const clientId = searchParams.get('clientId');
   const [recordData, setRecordData] = useState<Record['fields'] | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const searchParams = new URLSearchParams(window.location.search);
-      setClientId(searchParams.get('clientId'));
-    }
-  }, []);
 
   useEffect(() => {
     if (clientId) {
@@ -86,18 +78,11 @@ export default function CertRecord() {
   const renderFieldValue = (field: string) => {
     const value = recordData?.[field];
 
-    // If value is an object, check for the `url` property
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      const fieldValue = value as { url?: string };
-
-      if (fieldValue.url) {
-        return <img src={fieldValue.url} alt={field} className="w-24 h-24 object-cover" />;
-      }
-      // Handle any other objects as needed
-      return <pre>{JSON.stringify(value, null, 2)}</pre>;
+    // Check if the value is an object with a 'url' property (for images, for example)
+    if (value && typeof value === 'object' && value.hasOwnProperty('url')) {
+      return <img src={value.url} alt={field} className="w-24 h-24 object-cover" />;
     }
 
-    // For non-object values, just return them as is
     return value || 'N/A';
   };
 
