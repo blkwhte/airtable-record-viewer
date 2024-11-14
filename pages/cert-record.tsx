@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import { fetchCertRecord, Record } from '@/app/lib/airtable';
 import Image from 'next/image';
 
+interface ImageField {
+  url: string;
+}
+
 const sharedFields = [
   'App Name',
   'Application Icon',
@@ -83,19 +87,19 @@ export default function CertRecord() {
     }
   }
 
-  // Type narrowing for `renderFieldValue`
+  // Render field values with explicit type checks
   const renderFieldValue = (field: string) => {
     const value = recordData?.[field];
 
     // Check if the value is an array (e.g., for multiple images or other arrays)
     if (Array.isArray(value)) {
       return value.map((item, index) => {
-        // Make sure that `item` has a `url` property (image type)
+        // Ensure the item is of type `ImageField`
         if (item && typeof item === 'object' && 'url' in item) {
           return (
             <Image
               key={index}
-              src={item.url as string} // Type assertion to string since `url` is a string
+              src={item.url as string} // Ensure `url` is treated as a string
               alt={field}
               width={200}
               height={200}
@@ -104,21 +108,21 @@ export default function CertRecord() {
           );
         }
         return (
-          <span key={index}>N/A</span>
+          <span key={index}>N/A</span> // Add fallback in case there's no valid image
         );
       });
     }
 
-    // Check if the value is an object (e.g., for a single image or similar object)
+    // Check if the value is a single object (e.g., for a single image)
     if (value && typeof value === 'object' && 'url' in value) {
       return (
         <Image
           key={field}
-          src={value.url as string} // Type assertion to string
+          src={(value as ImageField).url} // Type assertion to ImageField
           alt={field}
+          width={100}
+          height={100}
           className="w-24 h-24 object-cover"
-          width={200}
-          height={200}
         />
       );
     }
