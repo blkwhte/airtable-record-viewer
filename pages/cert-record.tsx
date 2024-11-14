@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from 'react';
 import { fetchCertRecord, Record } from '@/app/lib/airtable';
@@ -50,9 +50,16 @@ const libraryOnlyFields = [
 ];
 
 export default function CertRecord() {
-  const searchParams = new URLSearchParams(window.location.search);
-  const clientId = searchParams.get('clientId');
+  const [clientId, setClientId] = useState<string | null>(null);
   const [recordData, setRecordData] = useState<Record['fields'] | null>(null);
+
+  useEffect(() => {
+    // Only run this on the client-side (browser)
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      setClientId(searchParams.get('clientId') || null);
+    }
+  }, []);
 
   useEffect(() => {
     if (clientId) {
@@ -78,15 +85,43 @@ export default function CertRecord() {
 
   const renderFieldValue = (field: string) => {
     const value = recordData?.[field];
-
-    // Check if the value is an object with a 'url' property (for images, for example)
-    if (value && typeof value === 'object' && 'url' in value) {
-      const imageUrl = (value as { url: string }).url; // Ensure TypeScript treats value as object with url
-      return <Image src={imageUrl} alt={field} width={96} height={96} className="object-cover" />;
+  
+    // Debugging: Log the value for inspection
+    console.log(`Rendering field: ${field}`, value);
+  
+    // Handle the "Application Icon" field (or other fields that might return an array of image objects)
+    if (field === 'Application Icon' && Array.isArray(value) && value.length > 0) {
+      const image = value[0]; // Access the first item in the array
+      // Ensure the object has a 'url' field and render the image
+      if (image && image.url) {
+        return <Image src={image.url} alt={field} width={100} height={100} />;
+      }
     }
-
+  
+    // Handle generic image objects
+    if (value && typeof value === 'object' && 'url' in value) {
+      return <Image src={value.url} alt={field} width={100} height={100} />;
+    }
+  
+    // If value is an array, display each item as a list
+    if (Array.isArray(value)) {
+      return (
+        <ul>
+          {value.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      );
+    }
+  
+    // If the value is an object, display a stringified version
+    if (typeof value === 'object') {
+      return <pre>{JSON.stringify(value, null, 2)}</pre>;
+    }
+  
+    // Render the value or 'N/A' if it's undefined or null
     return value || 'N/A';
-  };
+  };  
 
   return (
     <div className="container mx-auto p-6">
