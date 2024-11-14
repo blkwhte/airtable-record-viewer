@@ -83,17 +83,19 @@ export default function CertRecord() {
     }
   }
 
+  // Type narrowing for `renderFieldValue`
   const renderFieldValue = (field: string) => {
     const value = recordData?.[field];
-  
+
     // Check if the value is an array (e.g., for multiple images or other arrays)
     if (Array.isArray(value)) {
       return value.map((item, index) => {
+        // Make sure that `item` has a `url` property (image type)
         if (item && typeof item === 'object' && 'url' in item) {
           return (
             <Image
-              key={index} // Add key prop here for each image
-              src={item.url}
+              key={index}
+              src={item.url as string} // Type assertion to string since `url` is a string
               alt={field}
               width={200}
               height={200}
@@ -102,28 +104,29 @@ export default function CertRecord() {
           );
         }
         return (
-          <span key={index}>N/A</span> // Add key prop here for each fallback span
+          <span key={index}>N/A</span>
         );
       });
     }
-  
+
     // Check if the value is an object (e.g., for a single image or similar object)
     if (value && typeof value === 'object' && 'url' in value) {
       return (
         <Image
-          key={field} // Use field as the key for single items
-          src={value.url}
+          key={field}
+          src={value.url as string} // Type assertion to string
           alt={field}
           className="w-24 h-24 object-cover"
+          width={200}
+          height={200}
         />
       );
     }
-  
+
     // Fallback for other types
     return value || 'N/A';
   };
-  
-  
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Cert Record for Client ID: {clientId}</h1>
