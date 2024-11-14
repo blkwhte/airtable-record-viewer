@@ -8,9 +8,9 @@ First, obtain an Airtable Personal Access Token. You can learn more on how to do
 
 Second, create a .env.local file in your project and include the following environment variables:
 
-PERSONAL_ACCESS_TOKEN=
-NEXT_PUBLIC_TABLE_NAME=
-NEXT_PUBLIC_BASE_ID=
+- PERSONAL_ACCESS_TOKEN=
+- NEXT_PUBLIC_TABLE_NAME=
+- NEXT_PUBLIC_BASE_ID=
 
 Then, run the development server:
 
