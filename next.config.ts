@@ -9,7 +9,13 @@ module.exports = {
     NEXT_PUBLIC_TABLE_NAME: process.env.NEXT_PUBLIC_TABLE_NAME,
   },
   images: {
-    domains: ['v5.airtableusercontent.com'], 
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'v5.airtableusercontent.com',
+        pathname: '**',
+      },
+    ]
   },
 };
 

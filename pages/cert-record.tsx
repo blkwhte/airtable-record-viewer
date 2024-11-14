@@ -86,43 +86,26 @@ export default function CertRecord() {
   const renderFieldValue = (field: string) => {
     const value = recordData?.[field];
   
-    // Debugging: Log the value for inspection
-    console.log(`Rendering field: ${field}`, value);
-  
-    // Handle the "Application Icon" field (or other fields that might return an array of image objects)
-    if (field === 'Application Icon' && Array.isArray(value) && value.length > 0) {
-      const image = value[0]; // Access the first item in the array
-      // Ensure the object has a 'url' field and render the image
-      if (image && image.url) {
-        return <Image src={image.url} alt={field} width={100} height={100} />;
-      }
-    }
-  
-    // Handle generic image objects
-    if (value && typeof value === 'object' && 'url' in value) {
-      return <Image src={value.url} alt={field} width={100} height={100} />;
-    }
-  
-    // If value is an array, display each item as a list
+    // Check if the value is an array (e.g., for multiple images or other arrays)
     if (Array.isArray(value)) {
-      return (
-        <ul>
-          {value.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      );
+      return value.map((item, index) => {
+        const image = value[0];
+        if (item && typeof item === 'object' && 'url' in item) {
+            return <Image src={image.url} alt={field} width={100} height={100} />;
+        }
+        return <span key={index}>N/A</span>;
+      });
     }
   
-    // If the value is an object, display a stringified version
-    if (typeof value === 'object') {
-      return <pre>{JSON.stringify(value, null, 2)}</pre>;
+    // Check if the value is an object (e.g., for a single image or similar object)
+    if (value && typeof value === 'object' && 'url' in value) {
+      return <Image src={value.url} alt={field} className="w-24 h-24 object-cover" />;
     }
   
-    // Render the value or 'N/A' if it's undefined or null
+    // Fallback for other types
     return value || 'N/A';
-  };  
-
+  };
+  
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Cert Record for Client ID: {clientId}</h1>
