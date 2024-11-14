@@ -89,22 +89,40 @@ export default function CertRecord() {
     // Check if the value is an array (e.g., for multiple images or other arrays)
     if (Array.isArray(value)) {
       return value.map((item, index) => {
-        const image = value[0];
         if (item && typeof item === 'object' && 'url' in item) {
-            return <Image src={image.url} alt={field} width={100} height={100} />;
+          return (
+            <Image
+              key={index} // Add key prop here for each image
+              src={item.url}
+              alt={field}
+              width={200}
+              height={200}
+              className="w-24 h-24 object-cover"
+            />
+          );
         }
-        return <span key={index}>N/A</span>;
+        return (
+          <span key={index}>N/A</span> // Add key prop here for each fallback span
+        );
       });
     }
   
     // Check if the value is an object (e.g., for a single image or similar object)
     if (value && typeof value === 'object' && 'url' in value) {
-      return <Image src={value.url} alt={field} className="w-24 h-24 object-cover" />;
+      return (
+        <Image
+          key={field} // Use field as the key for single items
+          src={value.url}
+          alt={field}
+          className="w-24 h-24 object-cover"
+        />
+      );
     }
   
     // Fallback for other types
     return value || 'N/A';
   };
+  
   
   return (
     <div className="container mx-auto p-6">
